@@ -9,15 +9,15 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.activity_main.*
 
 import android.content.Intent
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import com.bumptech.glide.Glide
+import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.item_recipe.view.*
 
-
-
-
-data class Recipe(val name: String, val imageURL: String, val steps: List<String>)
+@Parcelize
+data class Recipe(val name: String, val imageURL: String, val steps: List<String>): Parcelable
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,11 +32,14 @@ class MainActivity : AppCompatActivity() {
             Recipe("Banana Bread", "https://images.pexels.com/photos/830894/pexels-photo-830894.jpeg", listOf("Step 1", "Step 2"))
         )
 
-        recipe_list.adapter = RecipeAdapter(recipes, this)
+        recipe_list.adapter = RecipeAdapter(recipes, this, recipeSelected = {
+            val intent = RecipeDetailActivity.newIntent(it, this)
+            startActivity(intent)
+        })
     }
 }
 
-private class RecipeAdapter(val recipes: List<Recipe>, val context: Context): RecyclerView.Adapter<RecipeViewHolder>()  {
+private class RecipeAdapter(val recipes: List<Recipe>, val context: Context, val recipeSelected: (Recipe) -> Unit): RecyclerView.Adapter<RecipeViewHolder>()  {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         return RecipeViewHolder(LayoutInflater.from(context).inflate(R.layout.item_recipe, parent, false))
     }
@@ -47,6 +50,10 @@ private class RecipeAdapter(val recipes: List<Recipe>, val context: Context): Re
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
         val recipe = recipes[position]
+
+        holder.itemView.setOnClickListener {
+            recipeSelected(recipe)
+        }
 
         holder.itemView.item_recipe_name.text = recipe.name
         Glide.with(context).load(recipe.imageURL).into(holder.itemView.item_recipe_image)
