@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
+import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.item_recipe.view.*
 
 
@@ -48,6 +49,7 @@ private class RecipeAdapter(val recipes: List<Recipe>, val context: Context): Re
         val recipe = recipes[position]
 
         holder.itemView.item_recipe_name.text = recipe.name
+        Glide.with(context).load(recipe.imageURL).into(holder.itemView.item_recipe_image)
     }
 }
 
